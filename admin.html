@@ -1023,6 +1023,11 @@
       if (cached) {
         try {
           siteData = JSON.parse(cached);
+          // Check compatibility for cached data
+          if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.principles || !siteData.contact || !siteData.achievements) {
+            siteData = Object.assign({}, DEFAULT_DATA, siteData);
+            localStorage.setItem('adi_site_data', JSON.stringify(siteData));
+          }
           renderAll();
         } catch (e) {}
       }
@@ -1033,10 +1038,24 @@
         dbConnected = true;
         dbWarningBanner.style.display = 'none';
         if (doc.exists) {
-          siteData = doc.data();
+          let fetchedData = doc.data();
+          // Check compatibility with older schemas
+          let needsUpdate = false;
+          if (!fetchedData.branding || !fetchedData.hero || !fetchedData.about || !fetchedData.principles || !fetchedData.contact || !fetchedData.achievements) {
+            fetchedData = Object.assign({}, DEFAULT_DATA, fetchedData);
+            needsUpdate = true;
+          }
+          siteData = fetchedData;
           localStorage.setItem('adi_site_data', JSON.stringify(siteData));
           renderAll();
           showToast("Connected to Firestore", "success");
+
+          if (needsUpdate) {
+            // Silently upgrade database schema in the background
+            db.collection('site_config').doc('adi_data').set(siteData)
+              .then(() => console.log("Database schema successfully upgraded with default fields."))
+              .catch(err => console.error("Failed to upgrade database schema:", err));
+          }
         } else {
           // Document doesn't exist yet, initialize it with DEFAULT_DATA
           showToast("Initializing database content...");
@@ -1051,14 +1070,14 @@
           });
         }
       }).catch((error) => {
-        console.error("Firestore connection error (database may not be created yet):", error);
+        console.error("Firestore connection error:", error);
         dbConnected = false;
         dbWarningBanner.style.display = 'flex';
         showToast("Using local storage fallback", "success");
       });
     }
 
-    // Check compatibility with older schemas
+    // Check compatibility with older schemas for initial siteData
     if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.principles || !siteData.contact || !siteData.achievements) {
       siteData = Object.assign({}, DEFAULT_DATA, siteData);
       localStorage.setItem('adi_site_data', JSON.stringify(siteData));
