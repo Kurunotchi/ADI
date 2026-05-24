@@ -391,6 +391,81 @@
       margin-bottom: 2rem;
     }
 
+    /* ACHIEVEMENTS / PORTFOLIO */
+    .achievements { background: var(--white); }
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2.5rem;
+      margin-top: 3rem;
+    }
+    .achievement-card {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+    .achievement-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent);
+    }
+    .achievement-img-wrapper {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+      background: var(--slate-100);
+    }
+    .achievement-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    .achievement-card:hover .achievement-img-wrapper img {
+      transform: scale(1.05);
+    }
+    .achievement-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--primary);
+      color: var(--white);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .achievement-content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 0.75rem;
+    }
+    .achievement-year {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .achievement-content h3 {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin: 0;
+    }
+    .achievement-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
     /* VALUES SECTION */
     .values { background: var(--off-white); }
     .values-grid {
@@ -595,11 +670,12 @@
 
   <nav id="navbar">
     <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px;">
-      <a href="#" class="nav-brand"><span>ADI</span> Services</a>
+      <a href="#" class="nav-brand" id="nav-brand"><span>ADI</span> Services</a>
 
       <div class="nav-links" id="navLinks">
         <a href="#about">About</a>
         <a href="#services">Services</a>
+        <a href="#achievements">Achievements</a>
         <a href="#pricing">Pricing</a>
         <a href="#contact">Contact</a>
         <a href="#contact" class="btn btn-primary">Get a Quote</a>
@@ -613,18 +689,18 @@
 
   <section class="hero">
     <div class="hero-bg">
-      <img src="https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg" alt="Background">
+      <img id="hero-bg-img" src="https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg" alt="Background">
     </div>
     <div class="container">
       <div class="hero-content reveal">
-        <div class="hero-eyebrow">
+        <div class="hero-eyebrow" id="hero-location-badge">
           <i data-lucide="map-pin" size="14"></i> Northern Palawan · Est. 2024
         </div>
-        <h1><span>ADI</span> Engineering <br>Solutions</h1>
-        <p class="hero-tagline">Precision in design, excellence in execution. We transform complex engineering challenges into sustainable architectural realities.</p>
+        <h1 id="hero-title"><span>ADI</span> Engineering <br>Solutions</h1>
+        <p class="hero-tagline" id="hero-tagline">Precision in design, excellence in execution. We transform complex engineering challenges into sustainable architectural realities.</p>
         <div class="hero-ctas">
-          <a href="#services" class="btn btn-primary">Explore Services <i data-lucide="arrow-right" size="16"></i></a>
-          <a href="#contact" class="btn btn-outline" style="color:white; border-color:white;">Contact Us</a>
+          <a id="hero-btn-1" href="#services" class="btn btn-primary">Explore Services <i data-lucide="arrow-right" size="16"></i></a>
+          <a id="hero-btn-2" href="#contact" class="btn btn-outline" style="color:white; border-color:white;">Contact Us</a>
         </div>
       </div>
     </div>
@@ -634,16 +710,18 @@
     <div class="container">
       <div class="about-grid">
         <div class="about-img-wrapper reveal">
-          <img src="https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg" alt="Our Team">
+          <img id="about-img" src="https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg" alt="Our Team">
           <div class="about-img-decorator"></div>
         </div>
         <div class="about-text reveal">
-          <span class="section-label">Who We Are</span>
-          <h2>Dedicated to Engineering Excellence</h2>
-          <p>ADI designs a complete set of plans for permitting purposes and construction use under clients' required design and government-set standards.</p>
-          <p>We specialize in delivering high-quality, affordable engineering and architectural services, ensuring that every project meets rigorous professional standards while remaining cost-effective.</p>
-          <p>As a focused start-up, we pride ourselves on agility and a commitment to excellence that exceeds client expectations, serving both the private sector and the broader community in Northern Palawan.</p>
-          <div class="about-accent-box">
+          <span class="section-label" id="about-eyebrow">Who We Are</span>
+          <h2 id="about-title">Dedicated to Engineering Excellence</h2>
+          <div id="about-paragraphs">
+            <p>ADI designs a complete set of plans for permitting purposes and construction use under clients' required design and government-set standards.</p>
+            <p>We specialize in delivering high-quality, affordable engineering and architectural services, ensuring that every project meets rigorous professional standards while remaining cost-effective.</p>
+            <p>As a focused start-up, we pride ourselves on agility and a commitment to excellence that exceeds client expectations, serving both the private sector and the broader community in Northern Palawan.</p>
+          </div>
+          <div class="about-accent-box" id="about-quote">
             "We build, support, and guide small businesses toward sustainable growth."
           </div>
         </div>
@@ -716,6 +794,41 @@
               <span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px;">ESP32 Specialist</span>
               <span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px;">IoT Integration</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="achievements section-padding" id="achievements">
+    <div class="container">
+      <div class="services-header text-center reveal">
+        <span class="section-label" id="achievements-eyebrow">Our Milestones</span>
+        <h2 id="achievements-title">Achievements & Projects</h2>
+        <p id="achievements-desc">A selection of our successful projects and engineering highlights across Palawan.</p>
+      </div>
+
+      <div class="achievements-grid" id="dynamic-achievements">
+        <div class="achievement-card reveal">
+          <div class="achievement-img-wrapper">
+            <img src="https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg" alt="Solar Substation">
+            <span class="achievement-badge">Electrical Engineering</span>
+          </div>
+          <div class="achievement-content">
+            <span class="achievement-year">2024</span>
+            <h3>Liminangcong Solar Substation Design</h3>
+            <p>Designed full permitting electrical blueprint for 150kW grid-tied solar system.</p>
+          </div>
+        </div>
+        <div class="achievement-card reveal">
+          <div class="achievement-img-wrapper">
+            <img src="https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg" alt="Structural Audit">
+            <span class="achievement-badge">Civil Engineering</span>
+          </div>
+          <div class="achievement-content">
+            <span class="achievement-year">2025</span>
+            <h3>Commercial Building Structural Audit</h3>
+            <p>Completed structural analysis and system integrity testing for a 3-story office building.</p>
           </div>
         </div>
       </div>
@@ -820,21 +933,21 @@
     <div class="container">
       <div class="text-center reveal">
         <span class="section-label" style="color: var(--accent);">Our Guiding Principle</span>
-        <blockquote class="principle-quote">
+        <blockquote class="principle-quote" id="principle-quote">
           "Design with purpose and innovate for a better future."
         </blockquote>
-        <p style="max-width: 700px; margin: 0 auto 4rem; color: rgba(255,255,255,0.7); font-size: 1.1rem;">
+        <p id="principle-desc" style="max-width: 700px; margin: 0 auto 4rem; color: rgba(255,255,255,0.7); font-size: 1.1rem;">
           We believe in fostering creativity, embracing challenges, and prioritizing excellence to create designs that stand the test of time. Through collaboration, sustainability, and a commitment to quality, we strive to build lasting value.
         </p>
       </div>
       <div class="principle-grid">
         <div class="principle-card reveal">
-          <h4>Our Vision</h4>
-          <p>To be a leader in engineering design by delivering innovative and sustainable solutions that inspire progress and success across the region.</p>
+          <h4 id="vision-title">Our Vision</h4>
+          <p id="vision-desc">To be a leader in engineering design by delivering innovative and sustainable solutions that inspire progress and success across the region.</p>
         </div>
         <div class="principle-card reveal">
-          <h4>Our Mission</h4>
-          <p>To empower businesses and industries by transforming complex ideas into exceptional designs that drive efficiency, reliability, and growth.</p>
+          <h4 id="mission-title">Our Mission</h4>
+          <p id="mission-desc">To empower businesses and industries by transforming complex ideas into exceptional designs that drive efficiency, reliability, and growth.</p>
         </div>
       </div>
     </div>
@@ -853,28 +966,28 @@
               <div class="detail-icon"><i data-lucide="phone"></i></div>
               <div>
                 <strong style="display:block; color:var(--primary)">Phone</strong>
-                <span>09664835400</span>
+                <span id="contact-phone">09664835400</span>
               </div>
             </div>
             <div class="detail-item">
               <div class="detail-icon"><i data-lucide="mail"></i></div>
               <div>
                 <strong style="display:block; color:var(--primary)">Email</strong>
-                <span>adisvc.info@gmail.com</span>
+                <span id="contact-email">adisvc.info@gmail.com</span>
               </div>
             </div>
             <div class="detail-item">
               <div class="detail-icon"><i data-lucide="map-pin"></i></div>
               <div>
                 <strong style="display:block; color:var(--primary)">Location</strong>
-                <span>Liminangcong, Palawan 5312</span>
+                <span id="contact-address">Liminangcong, Palawan 5312</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="contact-form reveal">
-          <form onsubmit="event.preventDefault(); alert('Thank you! Your request has been sent.');">
+          <form onsubmit="handleContactSubmit(event)">
             <div class="form-group">
               <label>Full Name</label>
               <input type="text" placeholder="John Doe" required>
@@ -922,8 +1035,8 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <a href="#" class="footer-brand"><span>ADI</span> Services</a>
-          <p class="footer-desc">Small start-up service company delivering excellence greater than expectations — serving the private sector and community in northern Palawan.</p>
+          <a href="#" class="footer-brand" id="footer-brand"><span>ADI</span> Services</a>
+          <p class="footer-desc" id="footer-desc">Small start-up service company delivering excellence greater than expectations — serving the private sector and community in northern Palawan.</p>
         </div>
         <div class="footer-col">
           <h4>Quick Links</h4>
@@ -968,6 +1081,31 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const nameInput = e.target.querySelector('input[type="text"]');
+      const emailInput = e.target.querySelector('input[type="email"]');
+      const serviceSelect = e.target.querySelector('select');
+      const messageTextarea = e.target.querySelector('textarea');
+      
+      const name = nameInput ? nameInput.value : '';
+      const email = emailInput ? emailInput.value : '';
+      const service = serviceSelect ? serviceSelect.value : '';
+      const message = messageTextarea ? messageTextarea.value : '';
+      const date = new Date().toISOString().split('T')[0];
+
+      const messages = JSON.parse(localStorage.getItem('adi_messages')) || [
+        { name: "John Doe", email: "john@example.com", service: "Architectural Plan", date: "2025-05-20", message: "Need a permit plan for a residential villa in El Nido.", status: "Pending" },
+        { name: "Jane Smith", email: "jane@example.com", service: "IoT Systems", date: "2025-05-18", message: "Inquiry about automated irrigation system.", status: "Replied" }
+      ];
+
+      messages.unshift({ name, email, service, date, message, status: "Pending" });
+      localStorage.setItem('adi_messages', JSON.stringify(messages));
+
+      alert('Thank you! Your request has been sent.');
+      e.target.reset();
+    }
 
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -1037,6 +1175,63 @@
     function renderContentFromData(storedData) {
       if (!storedData) return;
 
+      // 1. Branding
+      if (storedData.branding) {
+        const brandElements = document.querySelectorAll('#nav-brand, #footer-brand');
+        brandElements.forEach(el => {
+          el.innerHTML = `<span>${storedData.branding.logoText || 'ADI'}</span> ${storedData.branding.name || 'Services'}`;
+        });
+        if (storedData.branding.desc) {
+          const footerDesc = document.getElementById('footer-desc');
+          if (footerDesc) footerDesc.innerText = storedData.branding.desc;
+        }
+      }
+
+      // 2. Hero
+      if (storedData.hero) {
+        const heroBgImg = document.getElementById('hero-bg-img');
+        if (heroBgImg && storedData.hero.bgImage) heroBgImg.src = storedData.hero.bgImage;
+
+        const heroTitle = document.getElementById('hero-title');
+        if (heroTitle && storedData.hero.title) heroTitle.innerHTML = storedData.hero.title;
+
+        const heroTagline = document.getElementById('hero-tagline');
+        if (heroTagline && storedData.hero.tagline) heroTagline.innerText = storedData.hero.tagline;
+
+        const heroBtn1 = document.getElementById('hero-btn-1');
+        if (heroBtn1 && storedData.hero.btn1Text) {
+          heroBtn1.innerHTML = `${storedData.hero.btn1Text} <i data-lucide="arrow-right" size="16"></i>`;
+          heroBtn1.href = storedData.hero.btn1Link || '#services';
+        }
+        
+        const heroBtn2 = document.getElementById('hero-btn-2');
+        if (heroBtn2 && storedData.hero.btn2Text) {
+          heroBtn2.innerText = storedData.hero.btn2Text;
+          heroBtn2.href = storedData.hero.btn2Link || '#contact';
+        }
+      }
+
+      // 3. About
+      if (storedData.about) {
+        const aboutImg = document.getElementById('about-img');
+        if (aboutImg && storedData.about.image) aboutImg.src = storedData.about.image;
+
+        const aboutEyebrow = document.getElementById('about-eyebrow');
+        if (aboutEyebrow && storedData.about.eyebrow) aboutEyebrow.innerText = storedData.about.eyebrow;
+
+        const aboutTitle = document.getElementById('about-title');
+        if (aboutTitle && storedData.about.title) aboutTitle.innerText = storedData.about.title;
+
+        const aboutParagraphs = document.getElementById('about-paragraphs');
+        if (aboutParagraphs && storedData.about.paragraphs) {
+          aboutParagraphs.innerHTML = storedData.about.paragraphs.map(p => `<p>${p}</p>`).join('');
+        }
+
+        const aboutQuote = document.getElementById('about-quote');
+        if (aboutQuote && storedData.about.quote) aboutQuote.innerText = `"${storedData.about.quote}"`;
+      }
+
+      // 4. Services
       if (storedData.services) {
         const servicesGrid = document.getElementById('dynamic-services');
         if (servicesGrid) {
@@ -1055,13 +1250,36 @@
               </div>
             </div>
           `).join('');
-          lucide.createIcons();
-          // Re-observe new elements
+          
           const newReveals = servicesGrid.querySelectorAll('.reveal');
           newReveals.forEach(el => observer.observe(el));
         }
       }
 
+      // 5. Achievements
+      if (storedData.achievements) {
+        const achievementsGrid = document.getElementById('dynamic-achievements');
+        if (achievementsGrid) {
+          achievementsGrid.innerHTML = storedData.achievements.map(a => `
+            <div class="achievement-card reveal">
+              <div class="achievement-img-wrapper">
+                <img src="${a.image || 'https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg'}" alt="${a.title}">
+                <span class="achievement-badge">${a.category}</span>
+              </div>
+              <div class="achievement-content">
+                <span class="achievement-year">${a.year}</span>
+                <h3>${a.title}</h3>
+                <p>${a.desc}</p>
+              </div>
+            </div>
+          `).join('');
+          
+          const newReveals = achievementsGrid.querySelectorAll('.reveal');
+          newReveals.forEach(el => observer.observe(el));
+        }
+      }
+
+      // 6. Pricing
       if (storedData.pricing) {
         const pricingGrid = document.getElementById('dynamic-pricing');
         if (pricingGrid) {
@@ -1081,6 +1299,46 @@
         }
       }
 
+      // 7. Principles
+      if (storedData.principles) {
+        const pQuote = document.getElementById('principle-quote');
+        if (pQuote && storedData.principles.quote) pQuote.innerText = `"${storedData.principles.quote}"`;
+
+        const pDesc = document.getElementById('principle-desc');
+        if (pDesc && storedData.principles.desc) pDesc.innerText = storedData.principles.desc;
+
+        const vTitle = document.getElementById('vision-title');
+        if (vTitle && storedData.principles.visionTitle) vTitle.innerText = storedData.principles.visionTitle;
+
+        const vDesc = document.getElementById('vision-desc');
+        if (vDesc && storedData.principles.visionDesc) vDesc.innerText = storedData.principles.visionDesc;
+
+        const mTitle = document.getElementById('mission-title');
+        if (mTitle && storedData.principles.missionTitle) mTitle.innerText = storedData.principles.missionTitle;
+
+        const mDesc = document.getElementById('mission-desc');
+        if (mDesc && storedData.principles.missionDesc) mDesc.innerText = storedData.principles.missionDesc;
+      }
+
+      // 8. Contact Info
+      if (storedData.contact) {
+        const cPhone = document.getElementById('contact-phone');
+        if (cPhone && storedData.contact.phone) {
+          cPhone.innerText = storedData.contact.phone;
+        }
+
+        const cEmail = document.getElementById('contact-email');
+        if (cEmail && storedData.contact.email) {
+          cEmail.innerText = storedData.contact.email;
+        }
+
+        const cAddress = document.getElementById('contact-address');
+        if (cAddress && storedData.contact.address) {
+          cAddress.innerText = storedData.contact.address;
+        }
+      }
+
+      // 9. News
       if (storedData.news) {
         const newsGrid = document.getElementById('dynamic-news');
         if (newsGrid) {
@@ -1092,11 +1350,13 @@
               <a href="#" style="color: var(--primary); font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">Read More <i data-lucide="arrow-right" size="14"></i></a>
             </div>
           `).join('');
-          lucide.createIcons();
           const newReveals = newsGrid.querySelectorAll('.reveal');
           newReveals.forEach(el => observer.observe(el));
         }
       }
+
+      // Refresh Lucide Icons for dynamically generated markup
+      lucide.createIcons();
     }
 
     document.addEventListener('DOMContentLoaded', initDynamicContent);

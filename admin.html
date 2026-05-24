@@ -339,6 +339,65 @@
     .spin-icon {
       animation: spin 1s linear infinite;
     }
+    
+    /* MOBILE TOGGLE / RESPONSIVENESS CSS */
+    .menu-toggle-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--primary);
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 95;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+    
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    
+    /* Settings Tabs Styles */
+    .settings-sub-section {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .sidebar {
+        left: -260px;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+      .main-content {
+        margin-left: 0 !important;
+      }
+      .top-bar {
+        padding: 0 1rem;
+      }
+      .page-container {
+        padding: 1rem;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -352,6 +411,12 @@
     <div class="sidebar-menu">
       <div class="menu-item active" data-page="dashboard">
         <i data-lucide="layout-dashboard"></i> Dashboard
+      </div>
+      <div class="menu-item" data-page="settings">
+        <i data-lucide="sliders"></i> Page Settings
+      </div>
+      <div class="menu-item" data-page="achievements">
+        <i data-lucide="trophy"></i> Achievements
       </div>
       <div class="menu-item" data-page="services">
         <i data-lucide="cog"></i> Manage Services
@@ -375,7 +440,12 @@
 
   <main class="main-content">
     <header class="top-bar">
-      <h2 id="page-title">Dashboard</h2>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <button class="menu-toggle-btn" id="sidebarToggle">
+          <i data-lucide="menu"></i>
+        </button>
+        <h2 id="page-title">Dashboard</h2>
+      </div>
       <div style="display: flex; align-items: center; gap: 1rem;">
         <button class="btn btn-outline" onclick="resetSiteData()">Reset Defaults</button>
         <div class="user-profile">
@@ -479,6 +549,213 @@
         </div>
       </section>
 
+      <!-- Page Settings Section -->
+      <section class="page-section" id="settings">
+        <div class="card" style="padding: 2rem; margin-bottom: 2rem;">
+          <div class="card-header" style="border-bottom: none; padding: 0 0 1.5rem 0;">
+            <h3>Edit Website Content</h3>
+            <button class="btn btn-primary" onclick="saveSettingsForm()"><i data-lucide="save"></i> Save Settings</button>
+          </div>
+          
+          <div style="display: flex; gap: 10px; border-bottom: 2px solid var(--slate-200); padding-bottom: 1px; margin-bottom: 2rem; overflow-x: auto; white-space: nowrap;">
+            <button class="btn settings-tab active" data-subtab="settings-general" style="border-radius: 6px 6px 0 0; border-bottom: 3px solid var(--accent); background: none; color: var(--primary); padding: 0.75rem 1.25rem;">General</button>
+            <button class="btn settings-tab" data-subtab="settings-hero" style="border-radius: 6px 6px 0 0; background: none; color: var(--slate-500); padding: 0.75rem 1.25rem;">Hero</button>
+            <button class="btn settings-tab" data-subtab="settings-about" style="border-radius: 6px 6px 0 0; background: none; color: var(--slate-500); padding: 0.75rem 1.25rem;">About</button>
+            <button class="btn settings-tab" data-subtab="settings-principles" style="border-radius: 6px 6px 0 0; background: none; color: var(--slate-500); padding: 0.75rem 1.25rem;">Principles</button>
+            <button class="btn settings-tab" data-subtab="settings-contact" style="border-radius: 6px 6px 0 0; background: none; color: var(--slate-500); padding: 0.75rem 1.25rem;">Contact Details</button>
+          </div>
+
+          <form id="settingsForm" class="modal-form" style="max-width: 800px; gap: 1.5rem;" onsubmit="event.preventDefault();">
+            
+            <div class="settings-sub-section" id="settings-general">
+              <div class="form-group">
+                <label>Company Brand Name</label>
+                <input type="text" class="form-input" id="setting-brand-name">
+              </div>
+              <div class="form-group">
+                <label>Branding Logo Text</label>
+                <input type="text" class="form-input" id="setting-brand-logo">
+              </div>
+              <div class="form-group">
+                <label>Footer Description</label>
+                <textarea rows="3" class="form-input" id="setting-brand-desc" style="resize:vertical;"></textarea>
+              </div>
+            </div>
+
+            <div class="settings-sub-section" id="settings-hero" style="display: none;">
+              <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 1rem;">
+                  <div class="form-group">
+                    <label>Hero Background Image URL</label>
+                    <input type="text" class="form-input" id="setting-hero-bg" onchange="previewSettingImage('hero-bg-preview', this.value)">
+                  </div>
+                  <div class="form-group">
+                    <label>Or Upload Local Background Image</label>
+                    <input type="file" class="form-input" id="setting-hero-bg-file" accept="image/*" onchange="handleLocalImage(this, 'setting-hero-bg', 'hero-bg-preview')">
+                  </div>
+                </div>
+                <div style="width: 200px;">
+                  <label style="font-size: 0.8rem; font-weight: 600; color: var(--slate-500); display: block; margin-bottom: 0.5rem;">Background Image Preview</label>
+                  <div style="width: 100%; height: 120px; border-radius: 8px; border: 1px dashed var(--slate-300); overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--off-white);">
+                    <img id="hero-bg-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    <span id="hero-bg-preview-placeholder" style="color: var(--slate-400); font-size: 0.8rem;">No image selected</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Hero Heading Title (Supports HTML tags like &lt;span&gt; and &lt;br&gt;)</label>
+                <input type="text" class="form-input" id="setting-hero-title">
+              </div>
+              <div class="form-group">
+                <label>Hero Tagline / Subtitle</label>
+                <textarea rows="3" class="form-input" id="setting-hero-tagline" style="resize:vertical;"></textarea>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="form-group">
+                  <label>Primary Button Text</label>
+                  <input type="text" class="form-input" id="setting-hero-btn1-text">
+                </div>
+                <div class="form-group">
+                  <label>Primary Button Link</label>
+                  <input type="text" class="form-input" id="setting-hero-btn1-link">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="form-group">
+                  <label>Secondary Button Text</label>
+                  <input type="text" class="form-input" id="setting-hero-btn2-text">
+                </div>
+                <div class="form-group">
+                  <label>Secondary Button Link</label>
+                  <input type="text" class="form-input" id="setting-hero-btn2-link">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-sub-section" id="settings-about" style="display: none;">
+              <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 1rem;">
+                  <div class="form-group">
+                    <label>About Image URL</label>
+                    <input type="text" class="form-input" id="setting-about-img" onchange="previewSettingImage('about-img-preview', this.value)">
+                  </div>
+                  <div class="form-group">
+                    <label>Or Upload Local About Image</label>
+                    <input type="file" class="form-input" id="setting-about-img-file" accept="image/*" onchange="handleLocalImage(this, 'setting-about-img', 'about-img-preview')">
+                  </div>
+                </div>
+                <div style="width: 200px;">
+                  <label style="font-size: 0.8rem; font-weight: 600; color: var(--slate-500); display: block; margin-bottom: 0.5rem;">About Image Preview</label>
+                  <div style="width: 100%; height: 120px; border-radius: 8px; border: 1px dashed var(--slate-300); overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--off-white);">
+                    <img id="about-img-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    <span id="about-img-preview-placeholder" style="color: var(--slate-400); font-size: 0.8rem;">No image selected</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>About Eyebrow Text (Small Label)</label>
+                <input type="text" class="form-input" id="setting-about-eyebrow">
+              </div>
+              <div class="form-group">
+                <label>About Section Title</label>
+                <input type="text" class="form-input" id="setting-about-title">
+              </div>
+              <div class="form-group">
+                <label>Description Paragraph 1</label>
+                <textarea rows="3" class="form-input" id="setting-about-p1" style="resize:vertical;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Description Paragraph 2</label>
+                <textarea rows="3" class="form-input" id="setting-about-p2" style="resize:vertical;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Description Paragraph 3</label>
+                <textarea rows="3" class="form-input" id="setting-about-p3" style="resize:vertical;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>About Quote Box Content</label>
+                <input type="text" class="form-input" id="setting-about-quote">
+              </div>
+            </div>
+
+            <div class="settings-sub-section" id="settings-principles" style="display: none;">
+              <div class="form-group">
+                <label>Main Guiding Quote Text</label>
+                <textarea rows="2" class="form-input" id="setting-principle-quote" style="resize:vertical;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Description under Guiding Quote</label>
+                <textarea rows="3" class="form-input" id="setting-principle-desc" style="resize:vertical;"></textarea>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div>
+                  <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Vision Section Title</label>
+                    <input type="text" class="form-input" id="setting-vision-title">
+                  </div>
+                  <div class="form-group">
+                    <label>Vision Description Text</label>
+                    <textarea rows="4" class="form-input" id="setting-vision-desc" style="resize:vertical;"></textarea>
+                  </div>
+                </div>
+                <div>
+                  <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Mission Section Title</label>
+                    <input type="text" class="form-input" id="setting-mission-title">
+                  </div>
+                  <div class="form-group">
+                    <label>Mission Description Text</label>
+                    <textarea rows="4" class="form-input" id="setting-mission-desc" style="resize:vertical;"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-sub-section" id="settings-contact" style="display: none;">
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" class="form-input" id="setting-contact-phone">
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" class="form-input" id="setting-contact-email">
+              </div>
+              <div class="form-group">
+                <label>Office / Location Address</label>
+                <input type="text" class="form-input" id="setting-contact-address">
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+      <!-- Achievements Section -->
+      <section class="page-section" id="achievements">
+        <div class="card">
+          <div class="card-header">
+            <h3>Achievements & Portfolio</h3>
+            <button class="btn btn-primary" onclick="openAchievementModal()"><i data-lucide="plus"></i> Add Achievement</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Year</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="achievements-body">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- Services Section -->
       <section class="page-section" id="services">
         <div class="card">
@@ -491,34 +768,12 @@
               <thead>
                 <tr>
                   <th>Service Name</th>
-                  <th>Category</th>
-                  <th>Priority</th>
-                  <th>Status</th>
+                  <th>Description</th>
+                  <th>Icon</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Architectural Plan</td>
-                  <td>Design</td>
-                  <td>High</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td><button class="btn btn-outline">Edit</button></td>
-                </tr>
-                <tr>
-                  <td>Civil Structural Plan</td>
-                  <td>Engineering</td>
-                  <td>High</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td><button class="btn btn-outline">Edit</button></td>
-                </tr>
-                <tr>
-                  <td>IoT & Robotics</td>
-                  <td>Tech</td>
-                  <td>Medium</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td><button class="btn btn-outline">Edit</button></td>
-                </tr>
+              <tbody id="services-body">
               </tbody>
             </table>
           </div>
@@ -530,36 +785,20 @@
         <div class="card">
           <div class="card-header">
             <h3>Fee Management</h3>
+            <button class="btn btn-primary" onclick="openPriceModal()"><i data-lucide="plus"></i> Add Fee</button>
           </div>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
                   <th>Fee Label</th>
-                  <th>Current Amount</th>
+                  <th>Amount</th>
                   <th>Note</th>
+                  <th>Featured</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Residential Plan</td>
-                  <td>₱38,000</td>
-                  <td>Signed & Sealed</td>
-                  <td><button class="btn btn-outline">Update</button></td>
-                </tr>
-                <tr>
-                  <td>Permit Processing</td>
-                  <td>₱10,000</td>
-                  <td>Free revision included</td>
-                  <td><button class="btn btn-outline">Update</button></td>
-                </tr>
-                <tr>
-                  <td>Revision Fee</td>
-                  <td>₱450</td>
-                  <td>Per revision</td>
-                  <td><button class="btn btn-outline">Update</button></td>
-                </tr>
+              <tbody id="pricing-body">
               </tbody>
             </table>
           </div>
@@ -571,7 +810,7 @@
         <div class="card">
           <div class="card-header">
             <h3>Company Updates</h3>
-            <button class="btn btn-primary"><i data-lucide="megaphone"></i> Post Update</button>
+            <button class="btn btn-primary" onclick="openNewsModal()"><i data-lucide="megaphone"></i> Post Update</button>
           </div>
           <div class="table-container">
             <table>
@@ -583,19 +822,7 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>2024-12-24</td>
-                  <td>We Value Your Feedback!</td>
-                  <td>At ADI, we're committed to...</td>
-                  <td><button class="btn btn-outline">Edit</button></td>
-                </tr>
-                <tr>
-                  <td>2024-12-23</td>
-                  <td>Welcome to ADI Services</td>
-                  <td>We're thrilled to have you...</td>
-                  <td><button class="btn btn-outline">Edit</button></td>
-                </tr>
+              <tbody id="news-body">
               </tbody>
             </table>
           </div>
@@ -620,23 +847,7 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>John Doe</td>
-                  <td>john@example.com</td>
-                  <td>Architectural</td>
-                  <td>2025-05-20</td>
-                  <td><span class="badge badge-warning">Pending</span></td>
-                  <td><button class="btn btn-primary">Reply</button></td>
-                </tr>
-                <tr>
-                  <td>Jane Smith</td>
-                  <td>jane@example.com</td>
-                  <td>IoT Systems</td>
-                  <td>2025-05-18</td>
-                  <td><span class="badge badge-success">Replied</span></td>
-                  <td><button class="btn btn-outline">View</button></td>
-                </tr>
+              <tbody id="messages-body">
               </tbody>
             </table>
           </div>
@@ -645,10 +856,8 @@
     </div>
   </main>
 
-    </div>
-
-    <!-- MODALS -->
-    <div class="modal-overlay" id="modalOverlay">
+  <!-- MODALS -->
+  <div class="modal-overlay" id="modalOverlay">
       <div class="modal">
         <div class="modal-header">
           <h3 id="modalTitle">Edit Item</h3>
@@ -665,7 +874,7 @@
         </div>
       </div>
     </div>
-  </main>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- DB Saving Status Toast -->
   <div id="dbStatusToast" style="position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: var(--white); padding: 0.8rem 1.5rem; border-radius: 8px; box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; display: none; align-items: center; gap: 10px; z-index: 10000; transition: var(--transition);">
@@ -684,20 +893,61 @@
 
     // --- CMS DATA STATE ---
     const DEFAULT_DATA = {
+      branding: {
+        name: "ADI Services",
+        logoText: "ADI",
+        desc: "Small start-up service company delivering excellence greater than expectations — serving the private sector and community in northern Palawan."
+      },
+      hero: {
+        bgImage: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg",
+        title: "<span>ADI</span> Engineering <br>Solutions",
+        tagline: "Precision in design, excellence in execution. We transform complex engineering challenges into sustainable architectural realities.",
+        btn1Text: "Explore Services",
+        btn1Link: "#services",
+        btn2Text: "Contact Us",
+        btn2Link: "#contact"
+      },
+      about: {
+        image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg",
+        eyebrow: "Who We Are",
+        title: "Dedicated to Engineering Excellence",
+        paragraphs: [
+          "ADI designs a complete set of plans for permitting purposes and construction use under clients' required design and government-set standards.",
+          "We specialize in delivering high-quality, affordable engineering and architectural services, ensuring that every project meets rigorous professional standards while remaining cost-effective.",
+          "As a focused start-up, we pride ourselves on agility and a commitment to excellence that exceeds client expectations, serving both the private sector and the broader community in Northern Palawan."
+        ],
+        quote: "We build, support, and guide small businesses toward sustainable growth."
+      },
       services: [
-        { name: "Architectural Plan", desc: "Detailed blueprints designed for aesthetics and functionality.", icon: "pen-tool" },
-        { name: "Civil / Structural Plan", desc: "Robust structural engineering to ensure safety and stability.", icon: "layers" },
-        { name: "Electrical Plan", desc: "Safe and efficient electrical layouts optimized for energy.", icon: "zap" },
-        { name: "Plumbing Plan", desc: "Precision plumbing and sanitary system designs.", icon: "droplets" },
-        { name: "Fire Protection Plan", desc: "Comprehensive fire safety systems designed to protect lives.", icon: "flame" },
-        { name: "System Analysis", desc: "Structural and Electrical system analysis for design integrity.", icon: "activity" },
-        { name: "Cost Estimation", desc: "Accurate project budgeting and material takeoff.", icon: "calculator" },
-        { name: "Permit Application", desc: "Expert guidance and processing of government permits.", icon: "file-text" },
+        { name: "Architectural Plan", desc: "Detailed blueprints designed for aesthetics and functionality, meeting all local building codes.", icon: "pen-tool" },
+        { name: "Civil / Structural Plan", desc: "Robust structural engineering to ensure safety, stability, and long-term durability.", icon: "layers" },
+        { name: "Electrical Plan", desc: "Safe and efficient electrical layouts optimized for energy consumption and safety.", icon: "zap" },
+        { name: "Plumbing Plan", desc: "Precision plumbing and sanitary system designs for residential and commercial use.", icon: "droplets" },
+        { name: "Fire Protection Plan", desc: "Comprehensive fire safety systems designed to protect lives and property.", icon: "flame" },
+        { name: "System Analysis", desc: "Structural and Electrical system analysis to validate design integrity.", icon: "activity" },
+        { name: "Cost Estimation", desc: "Accurate project budgeting and material takeoff to prevent cost overruns.", icon: "calculator" },
+        { name: "Permit Application", desc: "Expert guidance and processing of government permits for a stress-free approval process.", icon: "file-text" },
         {
           name: "Arduino & IoT Ecosystems",
           desc: "We push the boundaries of automation and robotics. Custom PCB design to complex home automation.",
           icon: "cpu",
           tags: ["3D Printer Build", "Home Automation", "Robotics", "ESP32 Specialist", "IoT Integration"]
+        }
+      ],
+      achievements: [
+        {
+          title: "Liminangcong Solar Substation Design",
+          category: "Electrical Engineering",
+          year: "2024",
+          desc: "Designed full permitting electrical blueprint for 150kW grid-tied solar system.",
+          image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg"
+        },
+        {
+          title: "Commercial Building Structural Audit",
+          category: "Civil Engineering",
+          year: "2025",
+          desc: "Completed structural analysis and system integrity testing for a 3-story office building.",
+          image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg"
         }
       ],
       pricing: [
@@ -707,6 +957,19 @@
         { label: "Processing", amount: "10,000", note: "Permit Processing (Free revision included)", featured: false, cta: "Get Details" },
         { label: "Revision", amount: "450", note: "Per individual revision fee", featured: false, cta: "Learn More" }
       ],
+      principles: {
+        quote: "Design with purpose and innovate for a better future.",
+        desc: "We believe in fostering creativity, embracing challenges, and prioritizing excellence to create designs that stand the test of time. Through collaboration, sustainability, and a commitment to quality, we strive to build lasting value.",
+        visionTitle: "Our Vision",
+        visionDesc: "To be a leader in engineering design by delivering innovative and sustainable solutions that inspire progress and success across the region.",
+        missionTitle: "Our Mission",
+        missionDesc: "To empower businesses and industries by transforming complex ideas into exceptional designs that drive efficiency, reliability, and growth.",
+      },
+      contact: {
+        phone: "09664835400",
+        email: "adisvc.info@gmail.com",
+        address: "Liminangcong, Palawan 5312"
+      },
       news: [
         { date: "2024-12-24", title: "We Value Your Feedback!", excerpt: "At ADI, we're committed to providing exceptional service." },
         { date: "2024-12-23", title: "Welcome to ADI Services", excerpt: "We're thrilled to have you here. Explore our pages!" }
@@ -795,6 +1058,12 @@
       });
     }
 
+    // Check compatibility with older schemas
+    if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.principles || !siteData.contact || !siteData.achievements) {
+      siteData = Object.assign({}, DEFAULT_DATA, siteData);
+      localStorage.setItem('adi_site_data', JSON.stringify(siteData));
+    }
+
     function saveToStorage() {
       localStorage.setItem('adi_site_data', JSON.stringify(siteData));
       renderAll();
@@ -823,6 +1092,10 @@
       renderServices();
       renderPricing();
       renderNews();
+      renderAchievements();
+      renderMessages();
+      populateSettingsFields();
+      populateDashboardStats();
       lucide.createIcons();
     }
 
@@ -830,40 +1103,168 @@
       const body = document.getElementById('services-body');
       if(!body) return;
       body.innerHTML = siteData.services.map((s, i) => `
-        <tr>
-          <td>${s.name}</td>
+        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openServiceModal(${i})">
+          <td><strong>${s.name}</strong></td>
           <td>${s.desc}</td>
-          <td>${s.icon}</td>
-          <td><button class="btn btn-outline" onclick="openServiceModal(${i})">Edit</button></td>
+          <td><code style="background: var(--slate-100); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${s.icon}</code></td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" onclick="openServiceModal(${i})">Edit</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteService(${i})">Delete</button>
+            </div>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function deleteService(index) {
+      if (confirm("Are you sure you want to delete this service?")) {
+        siteData.services.splice(index, 1);
+        saveToStorage();
+      }
     }
 
     function renderPricing() {
       const body = document.getElementById('pricing-body');
       if(!body) return;
       body.innerHTML = siteData.pricing.map((p, i) => `
-        <tr>
-          <td>${p.label}</td>
+        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openPriceModal(${i})">
+          <td><strong>${p.label}</strong></td>
           <td>₱${p.amount}</td>
           <td>${p.note}</td>
-          <td>${p.featured ? 'Yes' : 'No'}</td>
-          <td><button class="btn btn-outline" onclick="openPriceModal(${i})">Update</button></td>
+          <td>${p.featured ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-info">No</span>'}</td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" onclick="openPriceModal(${i})">Edit</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deletePrice(${i})">Delete</button>
+            </div>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function deletePrice(index) {
+      if (confirm("Are you sure you want to delete this fee item?")) {
+        siteData.pricing.splice(index, 1);
+        saveToStorage();
+      }
     }
 
     function renderNews() {
       const body = document.getElementById('news-body');
       if(!body) return;
       body.innerHTML = siteData.news.map((n, i) => `
-        <tr>
+        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openNewsModal(${i})">
           <td>${n.date}</td>
-          <td>${n.title}</td>
-          <td>${n.excerpt}</td>
-          <td><button class="btn btn-outline" onclick="openNewsModal(${i})">Edit</button></td>
+          <td><strong>${n.title}</strong></td>
+          <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${n.excerpt}</td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" onclick="openNewsModal(${i})">Edit</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteNews(${i})">Delete</button>
+            </div>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function deleteNews(index) {
+      if (confirm("Are you sure you want to delete this news item?")) {
+        siteData.news.splice(index, 1);
+        saveToStorage();
+      }
+    }
+
+    function renderAchievements() {
+      const body = document.getElementById('achievements-body');
+      if(!body) return;
+      body.innerHTML = (siteData.achievements || []).map((a, i) => `
+        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openAchievementModal(${i})">
+          <td><img src="${a.image || 'https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg'}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px;"></td>
+          <td><strong>${a.title}</strong></td>
+          <td>${a.category}</td>
+          <td>${a.year}</td>
+          <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.desc}</td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" onclick="openAchievementModal(${i})">Edit</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteAchievement(${i})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteAchievement(index) {
+      if (confirm("Are you sure you want to delete this achievement?")) {
+        siteData.achievements.splice(index, 1);
+        saveToStorage();
+      }
+    }
+
+    function renderMessages() {
+      const body = document.getElementById('messages-body');
+      if(!body) return;
+      const messages = JSON.parse(localStorage.getItem('adi_messages')) || [
+        { name: "John Doe", email: "john@example.com", service: "Architectural Plan", date: "2025-05-20", message: "Need a permit plan for a residential villa in El Nido.", status: "Pending" },
+        { name: "Jane Smith", email: "jane@example.com", service: "IoT Systems", date: "2025-05-18", message: "Inquiry about automated irrigation system.", status: "Replied" }
+      ];
+      body.innerHTML = messages.map((m, i) => `
+        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') viewMessageModal(${i})">
+          <td><strong>${m.name}</strong></td>
+          <td>${m.email}</td>
+          <td>${m.service}</td>
+          <td>${m.date}</td>
+          <td><span class="badge ${m.status === 'Replied' ? 'badge-success' : 'badge-warning'}">${m.status}</span></td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" onclick="viewMessageModal(${i})">View</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteMessage(${i})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteMessage(index) {
+      if (confirm("Are you sure you want to delete this contact request?")) {
+        const messages = JSON.parse(localStorage.getItem('adi_messages')) || [];
+        messages.splice(index, 1);
+        localStorage.setItem('adi_messages', JSON.stringify(messages));
+        renderMessages();
+        populateDashboardStats();
+      }
+    }
+
+    function viewMessageModal(i) {
+      const messages = JSON.parse(localStorage.getItem('adi_messages')) || [
+        { name: "John Doe", email: "john@example.com", service: "Architectural Plan", date: "2025-05-20", message: "Need a permit plan for a residential villa in El Nido.", status: "Pending" },
+        { name: "Jane Smith", email: "jane@example.com", service: "IoT Systems", date: "2025-05-18", message: "Inquiry about automated irrigation system.", status: "Replied" }
+      ];
+      const m = messages[i];
+      
+      openModal('Quote Request Details', [
+        { id: 'name', label: 'Client Name', type: 'text', value: m.name },
+        { id: 'email', label: 'Email', type: 'text', value: m.email },
+        { id: 'service', label: 'Service', type: 'text', value: m.service },
+        { id: 'msg', label: 'Message', type: 'textarea', value: m.message }
+      ], () => {
+        messages[i].status = 'Replied';
+        localStorage.setItem('adi_messages', JSON.stringify(messages));
+        renderMessages();
+        populateDashboardStats();
+        closeModal();
+      });
+
+      // Make read-only after rendering form fields
+      setTimeout(() => {
+        ['name', 'email', 'service', 'msg'].forEach(id => {
+          const el = document.getElementById('field-' + id);
+          if (el) el.setAttribute('readonly', true);
+        });
+        const saveBtn = document.getElementById('saveBtn');
+        if (saveBtn) saveBtn.innerText = "Mark Replied";
+      }, 50);
     }
 
     // --- MODAL LOGIC ---
@@ -878,14 +1279,47 @@
 
     function openModal(title, fields, onSubmit) {
       modalTitle.innerText = title;
-      modalForm.innerHTML = fields.map(f => `
-        <div class="form-group">
-          <label>${f.label}</label>
-          <input type="${f.type}" class="form-input" id="field-${f.id}" value="${f.value}">
-        </div>
-      `).join('');
+      modalForm.innerHTML = fields.map(f => {
+        if (f.type === 'textarea') {
+          return `
+            <div class="form-group">
+              <label>${f.label}</label>
+              <textarea class="form-input" id="field-${f.id}" rows="4" style="resize:vertical;">${f.value || ''}</textarea>
+            </div>
+          `;
+        } else if (f.type === 'image') {
+          return `
+            <div class="form-group">
+              <label>${f.label} URL</label>
+              <input type="text" class="form-input" id="field-${f.id}" value="${f.value || ''}" onchange="document.getElementById('modal-img-preview').src = this.value; document.getElementById('modal-img-preview').style.display = this.value ? 'block' : 'none';">
+              <label style="margin-top: 0.5rem;">Or Upload File</label>
+              <input type="file" class="form-input" accept="image/*" onchange="compressImageFile(this, 'field-${f.id}', 'modal-img-preview')">
+              <div style="margin-top: 0.5rem; text-align: center; border: 1px dashed var(--slate-300); border-radius: 8px; padding: 0.5rem; background: var(--off-white);">
+                <img id="modal-img-preview" src="${f.value || ''}" style="max-height: 120px; max-width: 100%; border-radius: 4px; display: ${f.value ? 'block' : 'none'}; margin: 0 auto;">
+              </div>
+            </div>
+          `;
+        } else if (f.type === 'select') {
+          return `
+            <div class="form-group">
+              <label>${f.label}</label>
+              <select class="form-input" id="field-${f.id}">
+                ${f.options.map(opt => `<option value="${opt}" ${opt === f.value ? 'selected' : ''}>${opt}</option>`).join('')}
+              </select>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="form-group">
+              <label>${f.label}</label>
+              <input type="${f.type}" class="form-input" id="field-${f.id}" value="${f.value || ''}">
+            </div>
+          `;
+        }
+      }).join('');
 
       saveBtn.onclick = onSubmit;
+      saveBtn.innerText = "Save Changes"; // reset text
       modalOverlay.classList.add('active');
     }
 
@@ -893,7 +1327,7 @@
       const item = index !== null ? siteData.services[index] : { name: '', desc: '', icon: 'cog' };
       openModal(index === null ? 'Add Service' : 'Edit Service', [
         { id: 'name', label: 'Service Name', type: 'text', value: item.name },
-        { id: 'desc', label: 'Description', type: 'text', value: item.desc },
+        { id: 'desc', label: 'Description', type: 'textarea', value: item.desc },
         { id: 'icon', label: 'Lucide Icon Name', type: 'text', value: item.icon }
       ], () => {
         const updated = {
@@ -914,7 +1348,7 @@
         { id: 'label', label: 'Fee Label', type: 'text', value: item.label },
         { id: 'amount', label: 'Amount (₱)', type: 'text', value: item.amount },
         { id: 'note', label: 'Note', type: 'text', value: item.note },
-        { id: 'featured', label: 'Featured (true/false)', type: 'text', value: item.featured }
+        { id: 'featured', label: 'Featured (true/false)', type: 'select', value: item.featured ? 'true' : 'false', options: ['true', 'false'] }
       ], () => {
         const updated = {
           label: document.getElementById('field-label').value,
@@ -933,9 +1367,9 @@
     function openNewsModal(index = null) {
       const item = index !== null ? siteData.news[index] : { date: new Date().toISOString().split('T')[0], title: '', excerpt: '' };
       openModal(index === null ? 'Post Update' : 'Edit News', [
-        { id: 'date', label: 'Date', type: 'date', value: item.date },
+        { id: 'date', label: 'Date (e.g. YYYY-MM-DD)', type: 'text', value: item.date },
         { id: 'title', label: 'Title', type: 'text', value: item.title },
-        { id: 'excerpt', label: 'Excerpt', type: 'text', value: item.excerpt }
+        { id: 'excerpt', label: 'Excerpt', type: 'textarea', value: item.excerpt }
       ], () => {
         const updated = {
           date: document.getElementById('field-date').value,
@@ -949,7 +1383,209 @@
       });
     }
 
-    // Navigation Logic
+    function openAchievementModal(index = null) {
+      const item = index !== null ? siteData.achievements[index] : { title: '', category: '', year: new Date().getFullYear().toString(), desc: '', image: '' };
+      openModal(index === null ? 'Add Achievement' : 'Edit Achievement', [
+        { id: 'title', label: 'Project Title', type: 'text', value: item.title },
+        { id: 'category', label: 'Category', type: 'text', value: item.category },
+        { id: 'year', label: 'Year', type: 'text', value: item.year },
+        { id: 'desc', label: 'Description', type: 'textarea', value: item.desc },
+        { id: 'image', label: 'Project Image', type: 'image', value: item.image }
+      ], () => {
+        const updated = {
+          title: document.getElementById('field-title').value,
+          category: document.getElementById('field-category').value,
+          year: document.getElementById('field-year').value,
+          desc: document.getElementById('field-desc').value,
+          image: document.getElementById('field-image').value
+        };
+        if (index === null) siteData.achievements.push(updated);
+        else siteData.achievements[index] = updated;
+        saveToStorage();
+        closeModal();
+      });
+    }
+
+    // --- PAGE SETTINGS FORMS ---
+    function populateSettingsFields() {
+      // General Branding
+      document.getElementById('setting-brand-name').value = siteData.branding.name || '';
+      document.getElementById('setting-brand-logo').value = siteData.branding.logoText || '';
+      document.getElementById('setting-brand-desc').value = siteData.branding.desc || '';
+
+      // Hero
+      document.getElementById('setting-hero-bg').value = siteData.hero.bgImage || '';
+      document.getElementById('setting-hero-title').value = siteData.hero.title || '';
+      document.getElementById('setting-hero-tagline').value = siteData.hero.tagline || '';
+      document.getElementById('setting-hero-btn1-text').value = siteData.hero.btn1Text || '';
+      document.getElementById('setting-hero-btn1-link').value = siteData.hero.btn1Link || '';
+      document.getElementById('setting-hero-btn2-text').value = siteData.hero.btn2Text || '';
+      document.getElementById('setting-hero-btn2-link').value = siteData.hero.btn2Link || '';
+      previewSettingImage('hero-bg-preview', siteData.hero.bgImage);
+
+      // About
+      document.getElementById('setting-about-img').value = siteData.about.image || '';
+      document.getElementById('setting-about-eyebrow').value = siteData.about.eyebrow || '';
+      document.getElementById('setting-about-title').value = siteData.about.title || '';
+      const paragraphs = siteData.about.paragraphs || [];
+      document.getElementById('setting-about-p1').value = paragraphs[0] || '';
+      document.getElementById('setting-about-p2').value = paragraphs[1] || '';
+      document.getElementById('setting-about-p3').value = paragraphs[2] || '';
+      document.getElementById('setting-about-quote').value = siteData.about.quote || '';
+      previewSettingImage('about-img-preview', siteData.about.image);
+
+      // Principles
+      document.getElementById('setting-principle-quote').value = siteData.principles.quote || '';
+      document.getElementById('setting-principle-desc').value = siteData.principles.desc || '';
+      document.getElementById('setting-vision-title').value = siteData.principles.visionTitle || '';
+      document.getElementById('setting-vision-desc').value = siteData.principles.visionDesc || '';
+      document.getElementById('setting-mission-title').value = siteData.principles.missionTitle || '';
+      document.getElementById('setting-mission-desc').value = siteData.principles.missionDesc || '';
+
+      // Contact Details
+      document.getElementById('setting-contact-phone').value = siteData.contact.phone || '';
+      document.getElementById('setting-contact-email').value = siteData.contact.email || '';
+      document.getElementById('setting-contact-address').value = siteData.contact.address || '';
+    }
+
+    function previewSettingImage(imgId, url) {
+      const img = document.getElementById(imgId);
+      const placeholder = document.getElementById(imgId + '-placeholder');
+      if (img && placeholder) {
+        if (url) {
+          img.src = url;
+          img.style.display = 'block';
+          placeholder.style.display = 'none';
+        } else {
+          img.style.display = 'none';
+          placeholder.style.display = 'block';
+        }
+      }
+    }
+
+    // Canvas file compression
+    function compressImageFile(fileInput, targetInputId, previewImgId) {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const max_width = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > max_width) {
+            height = Math.round((height * max_width) / width);
+            width = max_width;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to JPEG with 0.7 quality to keep size small (<150KB)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          
+          // Set in input field
+          const targetInput = document.getElementById(targetInputId);
+          if (targetInput) {
+            targetInput.value = compressedBase64;
+          }
+          
+          // Update preview
+          const previewImg = document.getElementById(previewImgId);
+          if (previewImg) {
+            previewImg.src = compressedBase64;
+            previewImg.style.display = 'block';
+            
+            // If it's a Page Settings placeholder, hide it
+            const placeholder = document.getElementById(previewImgId + '-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleLocalImage(fileInput, targetInputId, previewImgId) {
+      compressImageFile(fileInput, targetInputId, previewImgId);
+    }
+
+    function saveSettingsForm() {
+      siteData.branding = {
+        name: document.getElementById('setting-brand-name').value,
+        logoText: document.getElementById('setting-brand-logo').value,
+        desc: document.getElementById('setting-brand-desc').value
+      };
+
+      siteData.hero = {
+        bgImage: document.getElementById('setting-hero-bg').value,
+        title: document.getElementById('setting-hero-title').value,
+        tagline: document.getElementById('setting-hero-tagline').value,
+        btn1Text: document.getElementById('setting-hero-btn1-text').value,
+        btn1Link: document.getElementById('setting-hero-btn1-link').value,
+        btn2Text: document.getElementById('setting-hero-btn2-text').value,
+        btn2Link: document.getElementById('setting-hero-btn2-link').value
+      };
+
+      siteData.about = {
+        image: document.getElementById('setting-about-img').value,
+        eyebrow: document.getElementById('setting-about-eyebrow').value,
+        title: document.getElementById('setting-about-title').value,
+        paragraphs: [
+          document.getElementById('setting-about-p1').value,
+          document.getElementById('setting-about-p2').value,
+          document.getElementById('setting-about-p3').value
+        ].filter(p => p.trim() !== ''),
+        quote: document.getElementById('setting-about-quote').value
+      };
+
+      siteData.principles = {
+        quote: document.getElementById('setting-principle-quote').value,
+        desc: document.getElementById('setting-principle-desc').value,
+        visionTitle: document.getElementById('setting-vision-title').value,
+        visionDesc: document.getElementById('setting-vision-desc').value,
+        missionTitle: document.getElementById('setting-mission-title').value,
+        missionDesc: document.getElementById('setting-mission-desc').value
+      };
+
+      siteData.contact = {
+        phone: document.getElementById('setting-contact-phone').value,
+        email: document.getElementById('setting-contact-email').value,
+        address: document.getElementById('setting-contact-address').value
+      };
+
+      saveToStorage();
+      alert("Page settings saved successfully!");
+    }
+
+    // --- DASHBOARD STATS ---
+    function populateDashboardStats() {
+      const stats = document.querySelectorAll('.stat-card .stat-info h3');
+      const messages = JSON.parse(localStorage.getItem('adi_messages')) || [];
+      const pendingCount = messages.filter(m => m.status === 'Pending').length;
+      
+      // Card 1: Total Projects (Hardcoded base 40 + achievements count)
+      const achievementsCount = siteData.achievements ? siteData.achievements.length : 0;
+      if (stats[0]) stats[0].innerText = 40 + achievementsCount;
+
+      // Card 2: New Requests (Dynamic from contact form requests)
+      if (stats[1]) stats[1].innerText = pendingCount;
+      
+      // Card 3: Annual Revenue (Hardcoded estimate)
+      if (stats[2]) stats[2].innerText = "₱1.2M";
+
+      // Card 4: Total Clients (Hardcoded estimate)
+      if (stats[3]) stats[3].innerText = "156";
+    }
+
+    // --- NAVIGATION EVENTS ---
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.page-section');
     const pageTitle = document.getElementById('page-title');
@@ -966,6 +1602,63 @@
         pageTitle.innerText = item.innerText.trim();
       });
     });
+
+    // Settings Sub-tabs Navigation Logic
+    const settingTabs = document.querySelectorAll('.settings-tab');
+    const settingSubsections = document.querySelectorAll('.settings-sub-section');
+
+    settingTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const subtabId = tab.getAttribute('data-subtab');
+        
+        settingTabs.forEach(t => {
+          t.classList.remove('active');
+          t.style.borderBottom = 'none';
+          t.style.color = 'var(--slate-500)';
+        });
+        
+        tab.classList.add('active');
+        tab.style.borderBottom = '3px solid var(--accent)';
+        tab.style.color = 'var(--primary)';
+
+        settingSubsections.forEach(sec => {
+          if (sec.id === subtabId) {
+            sec.style.display = 'block';
+          } else {
+            sec.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Sidebar Mobile Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    if (sidebarToggle && sidebar && sidebarOverlay) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+      });
+
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+      });
+
+      // Close sidebar on menu item click in mobile
+      const menuItemsNav = document.querySelectorAll('.sidebar-menu .menu-item');
+      menuItemsNav.forEach(item => {
+        item.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+          }
+        });
+      });
+    }
 
     // Initial Load
     loadFromDb();
