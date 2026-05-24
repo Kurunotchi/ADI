@@ -1353,11 +1353,15 @@
         const newsGrid = document.getElementById('dynamic-news');
         if (newsGrid) {
           newsGrid.innerHTML = storedData.news.map((n, i) => `
-            <div class="card reveal" style="padding: 2rem; transition: var(--transition); border: 1px solid var(--slate-200); cursor: pointer;">
-              <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem;">${n.date}</div>
-              <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">${n.title}</h3>
-              <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">${n.excerpt}</p>
-              <a href="#" style="color: var(--primary); font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">Read More <i data-lucide="arrow-right" size="14"></i></a>
+            <div class="card reveal" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--slate-200); border-radius: 12px; cursor: pointer; transition: var(--transition); background: var(--white); padding: 0;">
+              <div style="height: 200px; width: 100%; overflow: hidden; position: relative;">
+                <img src="${n.image || 'https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg'}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;">
+              </div>
+              <div style="padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem;">${n.date}</div>
+                <h3 style="margin-bottom: 0.75rem; font-size: 1.2rem; color: var(--primary);">${n.title}</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin: 0;">${n.excerpt}</p>
+              </div>
             </div>
           `).join('');
           const newReveals = newsGrid.querySelectorAll('.reveal');

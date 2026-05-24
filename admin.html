@@ -816,6 +816,7 @@
             <table>
               <thead>
                 <tr>
+                  <th>Image</th>
                   <th>Date</th>
                   <th>Title</th>
                   <th>Excerpt</th>
@@ -971,8 +972,8 @@
         address: "Liminangcong, Palawan 5312"
       },
       news: [
-        { date: "2024-12-24", title: "We Value Your Feedback!", excerpt: "At ADI, we're committed to providing exceptional service." },
-        { date: "2024-12-23", title: "Welcome to ADI Services", excerpt: "We're thrilled to have you here. Explore our pages!" }
+        { date: "2024-12-24", title: "We Value Your Feedback!", excerpt: "At ADI, we're committed to providing exceptional service.", image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg" },
+        { date: "2024-12-23", title: "Welcome to ADI Services", excerpt: "We're thrilled to have you here. Explore our pages!", image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg" }
       ]
     };
 
@@ -1174,6 +1175,7 @@
       if(!body) return;
       body.innerHTML = siteData.news.map((n, i) => `
         <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openNewsModal(${i})">
+          <td><img src="${n.image || 'https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg'}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px;"></td>
           <td>${n.date}</td>
           <td><strong>${n.title}</strong></td>
           <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${n.excerpt}</td>
@@ -1384,16 +1386,18 @@
     }
 
     function openNewsModal(index = null) {
-      const item = index !== null ? siteData.news[index] : { date: new Date().toISOString().split('T')[0], title: '', excerpt: '' };
+      const item = index !== null ? siteData.news[index] : { date: new Date().toISOString().split('T')[0], title: '', excerpt: '', image: '' };
       openModal(index === null ? 'Post Update' : 'Edit News', [
         { id: 'date', label: 'Date (e.g. YYYY-MM-DD)', type: 'text', value: item.date },
         { id: 'title', label: 'Title', type: 'text', value: item.title },
-        { id: 'excerpt', label: 'Excerpt', type: 'textarea', value: item.excerpt }
+        { id: 'excerpt', label: 'Excerpt', type: 'textarea', value: item.excerpt },
+        { id: 'image', label: 'News Image', type: 'image', value: item.image || '' }
       ], () => {
         const updated = {
           date: document.getElementById('field-date').value,
           title: document.getElementById('field-title').value,
-          excerpt: document.getElementById('field-excerpt').value
+          excerpt: document.getElementById('field-excerpt').value,
+          image: document.getElementById('field-image').value
         };
         if (index === null) siteData.news.push(updated);
         else siteData.news[index] = updated;
