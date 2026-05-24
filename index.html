@@ -1177,9 +1177,19 @@
 
       // 1. Branding
       if (storedData.branding) {
+        const logoText = storedData.branding.logoText || 'ADI';
+        const brandName = storedData.branding.name || 'Services';
+        let brandHtml = `<span>${logoText}</span> ${brandName}`;
+        
+        // Prevent duplication if the brand name already starts with the logo text (e.g. "ADI Services" becomes "ADI Services" with styled "ADI")
+        if (brandName.toLowerCase().startsWith(logoText.toLowerCase())) {
+          const nameRemainder = brandName.substring(logoText.length).trim();
+          brandHtml = `<span>${logoText}</span> ${nameRemainder}`;
+        }
+
         const brandElements = document.querySelectorAll('#nav-brand, #footer-brand');
         brandElements.forEach(el => {
-          el.innerHTML = `<span>${storedData.branding.logoText || 'ADI'}</span> ${storedData.branding.name || 'Services'}`;
+          el.innerHTML = brandHtml;
         });
         if (storedData.branding.desc) {
           const footerDesc = document.getElementById('footer-desc');
