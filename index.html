@@ -939,7 +939,7 @@
           <div class="footer-links">
             <a href="#">JAGMAG Solar</a>
             <a href="#">Papa Boys</a>
-            <a href="#">J. Naval Electrical Service</a>
+            <a href="#">J. Naval Electric</a>
             <a href="#">Allied Engineering Society</a>
           </div>
         </div>
@@ -951,7 +951,23 @@
     </div>
   </footer>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBDb9plg7GNPsdekbWoyUgMz9H3sJ1etA",
+      authDomain: "adi-engineering-solutions.firebaseapp.com",
+      projectId: "adi-engineering-solutions",
+      storageBucket: "adi-engineering-solutions.firebasestorage.app",
+      messagingSenderId: "282594700961",
+      appId: "1:282594700961:web:4cec848133ff88bd7f8ae0"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     // Initialize Lucide Icons
     lucide.createIcons();
 
@@ -993,7 +1009,31 @@
 
     // --- DYNAMIC CONTENT LOADING ---
     function initDynamicContent() {
-      const storedData = JSON.parse(localStorage.getItem('adi_site_data'));
+      // 1. Initial render from local cache if present
+      const cachedData = localStorage.getItem('adi_site_data');
+      if (cachedData) {
+        try {
+          renderContentFromData(JSON.parse(cachedData));
+        } catch (e) {
+          console.error("Error parsing cached data", e);
+        }
+      }
+
+      // 2. Fetch fresh data from Firestore
+      db.collection('site_config').doc('adi_data').get().then((doc) => {
+        if (doc.exists) {
+          const freshData = doc.data();
+          localStorage.setItem('adi_site_data', JSON.stringify(freshData));
+          renderContentFromData(freshData);
+        } else {
+          console.log("No remote config document found, using default/cached content.");
+        }
+      }).catch((error) => {
+        console.warn("Firestore fetch failed (normal if database is not initialized yet). Using local fallback:", error);
+      });
+    }
+
+    function renderContentFromData(storedData) {
       if (!storedData) return;
 
       if (storedData.services) {

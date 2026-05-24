@@ -332,6 +332,13 @@
       font-weight: 600;
       color: var(--slate-500);
     }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-icon {
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 <body>
@@ -377,6 +384,15 @@
         </div>
       </div>
     </header>
+
+    <!-- DB Warning Banner -->
+    <div id="dbWarningBanner" style="display: none; background: #fee2e2; border-bottom: 1px solid #fca5a5; padding: 0.75rem 2rem; color: #991b1b; font-size: 0.85rem; font-weight: 500; align-items: center; gap: 10px; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <i data-lucide="alert-triangle" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+        <span>Firestore Database is not initialized in project <strong>adi-engineering-solutions</strong>. Dynamic edits will only save locally.</span>
+      </div>
+      <a href="https://console.firebase.google.com/project/adi-engineering-solutions/firestore" target="_blank" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem; background: #dc2626; text-decoration: none; color: white;">Create Database</a>
+    </div>
 
     <div class="page-container">
       <!-- Dashboard Section -->
@@ -651,6 +667,17 @@
     </div>
   </main>
 
+  <!-- DB Saving Status Toast -->
+  <div id="dbStatusToast" style="position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: var(--white); padding: 0.8rem 1.5rem; border-radius: 8px; box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; display: none; align-items: center; gap: 10px; z-index: 10000; transition: var(--transition);">
+    <i id="dbStatusSpinner" data-lucide="loader" class="spin-icon" style="width: 16px; height: 16px; display: none;"></i>
+    <i id="dbStatusCheck" data-lucide="check-circle" style="width: 16px; height: 16px; color: #4ade80; display: none;"></i>
+    <span id="dbStatusMsg">Connecting to database...</span>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -686,11 +713,102 @@
       ]
     };
 
-    let siteData = JSON.parse(localStorage.getItem('adi_site_data')) || DEFAULT_DATA;
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBDb9plg7GNPsdekbWoyUgMz9H3sJ1etA",
+      authDomain: "adi-engineering-solutions.firebaseapp.com",
+      projectId: "adi-engineering-solutions",
+      storageBucket: "adi-engineering-solutions.firebasestorage.app",
+      messagingSenderId: "282594700961",
+      appId: "1:282594700961:web:4cec848133ff88bd7f8ae0"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let siteData = DEFAULT_DATA;
+    let dbConnected = false;
+
+    // Toast and Banner Elements
+    const dbWarningBanner = document.getElementById('dbWarningBanner');
+    const dbStatusToast = document.getElementById('dbStatusToast');
+    const dbStatusSpinner = document.getElementById('dbStatusSpinner');
+    const dbStatusCheck = document.getElementById('dbStatusCheck');
+    const dbStatusMsg = document.getElementById('dbStatusMsg');
+
+    function showToast(msg, type = 'loading') {
+      dbStatusToast.style.display = 'flex';
+      dbStatusMsg.innerText = msg;
+      if (type === 'loading') {
+        dbStatusSpinner.style.display = 'block';
+        dbStatusCheck.style.display = 'none';
+      } else if (type === 'success') {
+        dbStatusSpinner.style.display = 'none';
+        dbStatusCheck.style.display = 'block';
+        setTimeout(() => {
+          dbStatusToast.style.display = 'none';
+        }, 3000);
+      } else {
+        dbStatusSpinner.style.display = 'none';
+        dbStatusCheck.style.display = 'none';
+      }
+    }
+
+    // Load data from Firestore
+    function loadFromDb() {
+      // First try to load from local cache so user doesn't see a blank page
+      const cached = localStorage.getItem('adi_site_data');
+      if (cached) {
+        try {
+          siteData = JSON.parse(cached);
+          renderAll();
+        } catch (e) {}
+      }
+
+      showToast("Connecting to Firestore database...");
+
+      db.collection('site_config').doc('adi_data').get().then((doc) => {
+        dbConnected = true;
+        dbWarningBanner.style.display = 'none';
+        if (doc.exists) {
+          siteData = doc.data();
+          localStorage.setItem('adi_site_data', JSON.stringify(siteData));
+          renderAll();
+          showToast("Connected to Firestore", "success");
+        } else {
+          // Document doesn't exist yet, initialize it with DEFAULT_DATA
+          showToast("Initializing database content...");
+          db.collection('site_config').doc('adi_data').set(DEFAULT_DATA).then(() => {
+            siteData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            localStorage.setItem('adi_site_data', JSON.stringify(siteData));
+            renderAll();
+            showToast("Database initialized successfully", "success");
+          }).catch((err) => {
+            console.error("Failed to initialize database:", err);
+            showToast("Failed to initialize database", "error");
+          });
+        }
+      }).catch((error) => {
+        console.error("Firestore connection error (database may not be created yet):", error);
+        dbConnected = false;
+        dbWarningBanner.style.display = 'flex';
+        showToast("Using local storage fallback", "success");
+      });
+    }
 
     function saveToStorage() {
       localStorage.setItem('adi_site_data', JSON.stringify(siteData));
       renderAll();
+
+      if (dbConnected) {
+        showToast("Saving changes to Firestore...");
+        db.collection('site_config').doc('adi_data').set(siteData).then(() => {
+          showToast("Changes saved to database", "success");
+        }).catch((error) => {
+          console.error("Firestore save error:", error);
+          showToast("Save failed, saved locally", "error");
+          setTimeout(() => { dbStatusToast.style.display = 'none'; }, 3000);
+        });
+      }
     }
 
     function resetSiteData() {
@@ -850,7 +968,7 @@
     });
 
     // Initial Load
-    renderAll();
+    loadFromDb();
   </script>
 
 </body>
