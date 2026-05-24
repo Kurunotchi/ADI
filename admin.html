@@ -1298,8 +1298,7 @@
         footer.innerHTML = `
           <button class="btn btn-outline" onclick="closeModal()">Close</button>
           <button class="btn btn-outline" style="border-color: var(--slate-300); color: var(--slate-600);" id="markRepliedBtn">Mark Replied</button>
-          <button class="btn btn-outline" style="border-color: #ea4335; color: #ea4335; background: rgba(234, 67, 53, 0.05);" id="gmailReplyBtn"><i data-lucide="mail" style="width:14px; height:14px; display:inline-block; margin-right:4px;"></i> Reply via Gmail</button>
-          <button class="btn btn-primary" id="sendEmailBtn"><i data-lucide="send" style="width:14px; height:14px; display:inline-block; margin-right:4px;"></i> Reply via Mail App</button>
+          <button class="btn btn-primary" id="sendEmailBtn"><i data-lucide="send" style="width:14px; height:14px; display:inline-block; margin-right:4px;"></i> Send Email Reply</button>
         `;
         
         // Add event listeners for dynamic footer buttons
@@ -1311,29 +1310,13 @@
           closeModal();
         };
 
-        document.getElementById('gmailReplyBtn').onclick = () => {
+        document.getElementById('sendEmailBtn').onclick = () => {
           const replyText = document.getElementById('reply-text').value;
           const subject = `Re: ADI Services - ${m.service} Inquiry`;
           const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(m.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(replyText)}`;
           
-          // Open Gmail in a new tab
+          // Open Gmail in a new tab automatically
           window.open(gmailUrl, '_blank');
-
-          // Update status in system
-          messages[i].status = 'Replied';
-          localStorage.setItem('adi_messages', JSON.stringify(messages));
-          renderMessages();
-          populateDashboardStats();
-          closeModal();
-        };
-
-        document.getElementById('sendEmailBtn').onclick = () => {
-          const replyText = document.getElementById('reply-text').value;
-          const subject = `Re: ADI Services - ${m.service} Inquiry`;
-          const mailtoUrl = `mailto:${m.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(replyText)}`;
-          
-          // Open user's email client
-          window.location.href = mailtoUrl;
 
           // Update status in system
           messages[i].status = 'Replied';
