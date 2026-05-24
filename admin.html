@@ -1258,34 +1258,77 @@
     }
 
     function viewMessageModal(i) {
-      const messages = JSON.parse(localStorage.getItem('adi_messages')) || [
-        { name: "John Doe", email: "john@example.com", service: "Architectural Plan", date: "2025-05-20", message: "Need a permit plan for a residential villa in El Nido.", status: "Pending" },
-        { name: "Jane Smith", email: "jane@example.com", service: "IoT Systems", date: "2025-05-18", message: "Inquiry about automated irrigation system.", status: "Replied" }
-      ];
+      const messages = JSON.parse(localStorage.getItem('adi_messages')) || [];
       const m = messages[i];
-      
-      openModal('Quote Request Details', [
-        { id: 'name', label: 'Client Name', type: 'text', value: m.name },
-        { id: 'email', label: 'Email', type: 'text', value: m.email },
-        { id: 'service', label: 'Service', type: 'text', value: m.service },
-        { id: 'msg', label: 'Message', type: 'textarea', value: m.message }
-      ], () => {
-        messages[i].status = 'Replied';
-        localStorage.setItem('adi_messages', JSON.stringify(messages));
-        renderMessages();
-        populateDashboardStats();
-        closeModal();
-      });
+      if (!m) return;
 
-      // Make read-only after rendering form fields
-      setTimeout(() => {
-        ['name', 'email', 'service', 'msg'].forEach(id => {
-          const el = document.getElementById('field-' + id);
-          if (el) el.setAttribute('readonly', true);
-        });
-        const saveBtn = document.getElementById('saveBtn');
-        if (saveBtn) saveBtn.innerText = "Mark Replied";
-      }, 50);
+      modalTitle.innerText = 'Quote Request Details';
+      
+      const defaultReplyTemplate = `Hi ${m.name},\n\nThank you for reaching out to ADI Services regarding your interest in "${m.service}".\n\n[Type your reply details here]\n\nBest regards,\nADI Services Team`;
+
+      modalForm.innerHTML = `
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" class="form-input" value="${m.name}" readonly>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="text" class="form-input" value="${m.email}" readonly>
+        </div>
+        <div class="form-group">
+          <label>Requested Service</label>
+          <input type="text" class="form-input" value="${m.service}" readonly>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea class="form-input" readonly rows="3" style="resize:vertical;">${m.message}</textarea>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--slate-200); margin: 1.5rem 0;">
+        <div class="form-group">
+          <label style="color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="mail" style="width:16px; height:16px;"></i> Draft Email Reply
+          </label>
+          <textarea class="form-input" id="reply-text" rows="6" style="resize:vertical;">${defaultReplyTemplate}</textarea>
+        </div>
+      `;
+
+      // Update footer buttons dynamically
+      const footer = document.querySelector('.modal-overlay .modal-footer');
+      if (footer) {
+        footer.innerHTML = `
+          <button class="btn btn-outline" onclick="closeModal()">Close</button>
+          <button class="btn btn-outline" style="border-color: var(--primary); color: var(--primary);" id="markRepliedBtn">Mark Replied Only</button>
+          <button class="btn btn-primary" id="sendEmailBtn"><i data-lucide="send" style="width:14px; height:14px; display:inline-block; margin-right:4px;"></i> Send Email Reply</button>
+        `;
+        
+        // Add event listeners for dynamic footer buttons
+        document.getElementById('markRepliedBtn').onclick = () => {
+          messages[i].status = 'Replied';
+          localStorage.setItem('adi_messages', JSON.stringify(messages));
+          renderMessages();
+          populateDashboardStats();
+          closeModal();
+        };
+
+        document.getElementById('sendEmailBtn').onclick = () => {
+          const replyText = document.getElementById('reply-text').value;
+          const subject = `Re: ADI Services - ${m.service} Inquiry`;
+          const mailtoUrl = `mailto:${m.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(replyText)}`;
+          
+          // Open user's email client
+          window.location.href = mailtoUrl;
+
+          // Update status in system
+          messages[i].status = 'Replied';
+          localStorage.setItem('adi_messages', JSON.stringify(messages));
+          renderMessages();
+          populateDashboardStats();
+          closeModal();
+        };
+      }
+
+      lucide.createIcons();
+      modalOverlay.classList.add('active');
     }
 
     // --- MODAL LOGIC ---
@@ -1296,6 +1339,14 @@
 
     function closeModal() {
       modalOverlay.classList.remove('active');
+      // Restore default modal footer buttons
+      const footer = document.querySelector('.modal-overlay .modal-footer');
+      if (footer) {
+        footer.innerHTML = `
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="saveBtn">Save Changes</button>
+        `;
+      }
     }
 
     function openModal(title, fields, onSubmit) {
