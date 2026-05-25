@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "adi-engineering-solutions",
     "public": ".",
     "ignore": [
       "firebase.json",
