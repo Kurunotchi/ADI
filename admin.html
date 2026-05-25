@@ -501,7 +501,7 @@
         <div class="card">
           <div class="card-header">
             <h3>Recent Project Activity</h3>
-            <button class="btn btn-outline">View All</button>
+            <button class="btn btn-primary" onclick="openProjectModal()"><i data-lucide="plus"></i> Add Project</button>
           </div>
           <div class="table-container">
             <table>
@@ -512,37 +512,10 @@
                   <th>Service</th>
                   <th>Status</th>
                   <th>Progress</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Green Valley Residence</td>
-                  <td>Juan Dela Cruz</td>
-                  <td>Architectural</td>
-                  <td><span class="badge badge-success">Completed</span></td>
-                  <td>100%</td>
-                </tr>
-                <tr>
-                  <td>City Center Plaza</td>
-                  <td>Metro Dev Corp</td>
-                  <td>Structural</td>
-                  <td><span class="badge badge-warning">In Progress</span></td>
-                  <td>65%</td>
-                </tr>
-                <tr>
-                  <td>Lake View Villa</td>
-                  <td>Maria Santos</td>
-                  <td>Electrical</td>
-                  <td><span class="badge badge-info">Planning</span></td>
-                  <td>15%</td>
-                </tr>
-                <tr>
-                  <td>Eco-Hub Office</td>
-                  <td>Solar Systems Inc</td>
-                  <td>IoT Systems</td>
-                  <td><span class="badge badge-success">Completed</span></td>
-                  <td>100%</td>
-                </tr>
+              <tbody id="projects-body">
               </tbody>
             </table>
           </div>
@@ -865,7 +838,7 @@
           <button class="btn btn-outline" onclick="closeModal()"><i data-lucide="x"></i></button>
         </div>
         <div class="modal-content">
-          <form id="modalForm" class="modal-form">
+          <form id="modalForm" class="modal-form" onsubmit="event.preventDefault();">
             <!-- Dynamic Form Fields -->
           </form>
         </div>
@@ -974,6 +947,12 @@
       news: [
         { date: "2024-12-24", title: "We Value Your Feedback!", excerpt: "At ADI, we're committed to providing exceptional service.", image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg" },
         { date: "2024-12-23", title: "Welcome to ADI Services", excerpt: "We're thrilled to have you here. Explore our pages!", image: "https://adisvc.wordpress.com/wp-content/uploads/2025/02/17342371170378890969510175798912.jpg" }
+      ],
+      projects: [
+        { name: "Green Valley Residence", client: "Juan Dela Cruz", service: "Architectural", status: "Completed", progress: "100%" },
+        { name: "City Center Plaza", client: "Metro Dev Corp", service: "Structural", status: "In Progress", progress: "65%" },
+        { name: "Lake View Villa", client: "Maria Santos", service: "Electrical", status: "Planning", progress: "15%" },
+        { name: "Eco-Hub Office", client: "Solar Systems Inc", service: "IoT Systems", status: "Completed", progress: "100%" }
       ]
     };
 
@@ -1025,7 +1004,7 @@
         try {
           siteData = JSON.parse(cached);
           // Check compatibility for cached data
-          if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.principles || !siteData.contact || !siteData.achievements) {
+          if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.services || !siteData.achievements || !siteData.pricing || !siteData.principles || !siteData.contact || !siteData.news || !siteData.projects) {
             siteData = Object.assign({}, DEFAULT_DATA, siteData);
             localStorage.setItem('adi_site_data', JSON.stringify(siteData));
           }
@@ -1042,7 +1021,7 @@
           let fetchedData = doc.data();
           // Check compatibility with older schemas
           let needsUpdate = false;
-          if (!fetchedData.branding || !fetchedData.hero || !fetchedData.about || !fetchedData.principles || !fetchedData.contact || !fetchedData.achievements) {
+          if (!fetchedData.branding || !fetchedData.hero || !fetchedData.about || !fetchedData.services || !fetchedData.achievements || !fetchedData.pricing || !fetchedData.principles || !fetchedData.contact || !fetchedData.news || !fetchedData.projects) {
             fetchedData = Object.assign({}, DEFAULT_DATA, fetchedData);
             needsUpdate = true;
           }
@@ -1079,7 +1058,7 @@
     }
 
     // Check compatibility with older schemas for initial siteData
-    if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.principles || !siteData.contact || !siteData.achievements) {
+    if (!siteData.branding || !siteData.hero || !siteData.about || !siteData.services || !siteData.achievements || !siteData.pricing || !siteData.principles || !siteData.contact || !siteData.news || !siteData.projects) {
       siteData = Object.assign({}, DEFAULT_DATA, siteData);
       localStorage.setItem('adi_site_data', JSON.stringify(siteData));
     }
@@ -1109,6 +1088,7 @@
 
     // --- UI RENDERING ---
     function renderAll() {
+      renderProjects();
       renderServices();
       renderPricing();
       renderNews();
@@ -1119,18 +1099,51 @@
       lucide.createIcons();
     }
 
+    function renderProjects() {
+      const body = document.getElementById('projects-body');
+      if(!body) return;
+      body.innerHTML = (siteData.projects || []).map((p, i) => {
+        let badgeClass = 'badge-info';
+        if (p.status === 'Completed') badgeClass = 'badge-success';
+        else if (p.status === 'In Progress') badgeClass = 'badge-warning';
+        
+        return `
+          <tr>
+            <td><strong>${p.name}</strong></td>
+            <td>${p.client}</td>
+            <td>${p.service}</td>
+            <td><span class="badge ${badgeClass}">${p.status}</span></td>
+            <td>${p.progress}</td>
+            <td>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-outline" onclick="openProjectModal(${i})">Edit</button>
+                <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="deleteProject(${i})">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function deleteProject(index) {
+      if (confirm("Are you sure you want to delete this project?")) {
+        siteData.projects.splice(index, 1);
+        saveToStorage();
+      }
+    }
+
     function renderServices() {
       const body = document.getElementById('services-body');
       if(!body) return;
       body.innerHTML = siteData.services.map((s, i) => `
-        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openServiceModal(${i})">
+        <tr>
           <td><strong>${s.name}</strong></td>
           <td>${s.desc}</td>
           <td><code style="background: var(--slate-100); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${s.icon}</code></td>
           <td>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-outline" onclick="openServiceModal(${i})">Edit</button>
-              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteService(${i})">Delete</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="deleteService(${i})">Delete</button>
             </div>
           </td>
         </tr>
@@ -1148,7 +1161,7 @@
       const body = document.getElementById('pricing-body');
       if(!body) return;
       body.innerHTML = siteData.pricing.map((p, i) => `
-        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openPriceModal(${i})">
+        <tr>
           <td><strong>${p.label}</strong></td>
           <td>₱${p.amount}</td>
           <td>${p.note}</td>
@@ -1156,7 +1169,7 @@
           <td>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-outline" onclick="openPriceModal(${i})">Edit</button>
-              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deletePrice(${i})">Delete</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="deletePrice(${i})">Delete</button>
             </div>
           </td>
         </tr>
@@ -1174,7 +1187,7 @@
       const body = document.getElementById('news-body');
       if(!body) return;
       body.innerHTML = siteData.news.map((n, i) => `
-        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openNewsModal(${i})">
+        <tr>
           <td><img src="${n.image || 'https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg'}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px;"></td>
           <td>${n.date}</td>
           <td><strong>${n.title}</strong></td>
@@ -1182,7 +1195,7 @@
           <td>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-outline" onclick="openNewsModal(${i})">Edit</button>
-              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteNews(${i})">Delete</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="deleteNews(${i})">Delete</button>
             </div>
           </td>
         </tr>
@@ -1200,7 +1213,7 @@
       const body = document.getElementById('achievements-body');
       if(!body) return;
       body.innerHTML = (siteData.achievements || []).map((a, i) => `
-        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openAchievementModal(${i})">
+        <tr>
           <td><img src="${a.image || 'https://adisvc.wordpress.com/wp-content/uploads/2025/02/1734879007802-12216342003153938413.jpg'}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px;"></td>
           <td><strong>${a.title}</strong></td>
           <td>${a.category}</td>
@@ -1209,7 +1222,7 @@
           <td>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-outline" onclick="openAchievementModal(${i})">Edit</button>
-              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteAchievement(${i})">Delete</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="deleteAchievement(${i})">Delete</button>
             </div>
           </td>
         </tr>
@@ -1231,7 +1244,7 @@
         { name: "Jane Smith", email: "jane@example.com", service: "IoT Systems", date: "2025-05-18", message: "Inquiry about automated irrigation system.", status: "Replied" }
       ];
       body.innerHTML = messages.map((m, i) => `
-        <tr style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') viewMessageModal(${i})">
+        <tr>
           <td><strong>${m.name}</strong></td>
           <td>${m.email}</td>
           <td>${m.service}</td>
@@ -1240,7 +1253,7 @@
           <td>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-primary" onclick="viewMessageModal(${i})">View</button>
-              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="event.stopPropagation(); deleteMessage(${i})">Delete</button>
+              <button class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255, 77, 77, 0.2);" onclick="deleteMessage(${i})">Delete</button>
             </div>
           </td>
         </tr>
@@ -1335,7 +1348,6 @@
     const modalOverlay = document.getElementById('modalOverlay');
     const modalForm = document.getElementById('modalForm');
     const modalTitle = document.getElementById('modalTitle');
-    const saveBtn = document.getElementById('saveBtn');
 
     function closeModal() {
       modalOverlay.classList.remove('active');
@@ -1390,8 +1402,11 @@
         }
       }).join('');
 
-      saveBtn.onclick = onSubmit;
-      saveBtn.innerText = "Save Changes"; // reset text
+      const dynamicSaveBtn = document.getElementById('saveBtn');
+      if (dynamicSaveBtn) {
+        dynamicSaveBtn.onclick = onSubmit;
+        dynamicSaveBtn.innerText = "Save Changes"; // reset text
+      }
       modalOverlay.classList.add('active');
     }
 
@@ -1409,6 +1424,33 @@
         };
         if (index === null) siteData.services.push(updated);
         else siteData.services[index] = updated;
+        saveToStorage();
+        closeModal();
+      });
+    }
+
+    function openProjectModal(index = null) {
+      const item = index !== null ? siteData.projects[index] : { name: '', client: '', service: 'Architectural', status: 'Planning', progress: '0%' };
+      openModal(index === null ? 'Add Project' : 'Edit Project', [
+        { id: 'name', label: 'Project Name', type: 'text', value: item.name },
+        { id: 'client', label: 'Client Name', type: 'text', value: item.client },
+        { id: 'service', label: 'Service Needed', type: 'select', value: item.service, options: ['Architectural', 'Structural', 'Electrical', 'Plumbing', 'Fire Protection', 'System Analysis', 'Cost Estimation', 'Permit Application', 'IoT Systems', 'Other'] },
+        { id: 'status', label: 'Status', type: 'select', value: item.status, options: ['Planning', 'In Progress', 'Completed'] },
+        { id: 'progress', label: 'Progress (e.g., 15%, 65%, 100%)', type: 'text', value: item.progress }
+      ], () => {
+        const updated = {
+          name: document.getElementById('field-name').value,
+          client: document.getElementById('field-client').value,
+          service: document.getElementById('field-service').value,
+          status: document.getElementById('field-status').value,
+          progress: document.getElementById('field-progress').value
+        };
+        if (index === null) {
+          if (!siteData.projects) siteData.projects = [];
+          siteData.projects.push(updated);
+        } else {
+          siteData.projects[index] = updated;
+        }
         saveToStorage();
         closeModal();
       });
@@ -1538,12 +1580,29 @@
     }
 
     // Canvas file compression
-    function compressImageFile(fileInput, targetInputId, previewImgId) {
+    function compressImageFile(fileInput, targetInputId, previewImgId, isHeroBg = false) {
       const file = fileInput.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
+        if (isHeroBg) {
+          // Bypass compression to preserve original quality for hero background
+          const originalBase64 = e.target.result;
+          const targetInput = document.getElementById(targetInputId);
+          if (targetInput) {
+            targetInput.value = originalBase64;
+          }
+          const previewImg = document.getElementById(previewImgId);
+          if (previewImg) {
+            previewImg.src = originalBase64;
+            previewImg.style.display = 'block';
+            const placeholder = document.getElementById(previewImgId + '-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+          }
+          return;
+        }
+
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
@@ -1588,7 +1647,8 @@
     }
 
     function handleLocalImage(fileInput, targetInputId, previewImgId) {
-      compressImageFile(fileInput, targetInputId, previewImgId);
+      const isHeroBg = targetInputId === 'setting-hero-bg';
+      compressImageFile(fileInput, targetInputId, previewImgId, isHeroBg);
     }
 
     function saveSettingsForm() {
@@ -1645,9 +1705,9 @@
       const messages = JSON.parse(localStorage.getItem('adi_messages')) || [];
       const pendingCount = messages.filter(m => m.status === 'Pending').length;
       
-      // Card 1: Total Projects (Hardcoded base 40 + achievements count)
-      const achievementsCount = siteData.achievements ? siteData.achievements.length : 0;
-      if (stats[0]) stats[0].innerText = 40 + achievementsCount;
+      // Card 1: Total Projects (Dynamic: base 38 + projects count)
+      const projectsCount = siteData.projects ? siteData.projects.length : 0;
+      if (stats[0]) stats[0].innerText = 38 + projectsCount;
 
       // Card 2: New Requests (Dynamic from contact form requests)
       if (stats[1]) stats[1].innerText = pendingCount;
